@@ -1,0 +1,12 @@
+/*
+    Souffle uses C style comments, wild
+    To compile: souffle -F. -D. first.dl
+    Here -F is the input file, if you just put a dot then it means in this directory. You can put a path here
+    -D is the output directory, if you just put a dot then it means in this directory. You can put a path here
+*/
+
+cow(x) :- animal(x), mammal(x), domestic(x).
+
+domestic("Scooby Doo").
+?- cow("Scooby Doo").
+
