@@ -1,0 +1,18 @@
+/*
+    Souffle uses C style comments, wild
+    To compile: souffle -F. -D. first.dl
+    Here -F is the input file, if you just put a dot then it means in this directory. You can put a path here
+    -D is the output directory, if you just put a dot then it means in this directory. You can put a path here
+*/
+// this is a comment too 
+.decl edge(x:number, y:number) // here we declare edge, a relation with two columns
+.input edge // here we tell Souffle to read the relation from a file using "input"
+
+// the input uses a .facts file with the name given after the input. would be cool if there was some sort of .ipynb magic to do this comments 
+
+.decl path(x:number, y:number) // here we declare path, a relation with two columns
+.output path // here we tell Souffle to write the relation to a file using "output", I think, haven't tested yet 
+
+path(x, y) :- edge(x, y). // here we define the rule for path, it is a fact, so it is just a relation with two columns
+path(x, z) :- path(x, y), edge(y, z). // here we define the rule for path, it is a fact, so it is just a relation with two columns
+
