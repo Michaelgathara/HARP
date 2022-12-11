@@ -1,0 +1,3 @@
+/mnt/c/Users/Gmike/Documents/University/UAB/HARP/FALL2022/Souffle/cmake-build-debug/CMakeFiles/Souffle.dir
+/mnt/c/Users/Gmike/Documents/University/UAB/HARP/FALL2022/Souffle/cmake-build-debug/CMakeFiles/edit_cache.dir
+/mnt/c/Users/Gmike/Documents/University/UAB/HARP/FALL2022/Souffle/cmake-build-debug/CMakeFiles/rebuild_cache.dir

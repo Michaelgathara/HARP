@@ -1,0 +1,7 @@
+Employee(John, 25000),
+Employee(Jane, 30000),
+Employee(Bob, 35000),
+
+highEarners(X) :- Employee(X, Y), Y > 30000.
+
+highEarners(Bob),

@@ -1,3 +1,7 @@
+/**
+ * Documentation: https://souffle-lang.github.io/souffle/index.html
+ */
+
 #include "souffle/CompiledSouffle.h"
 
 namespace functors {
@@ -58,7 +62,7 @@ namespace souffle {
       };
       return insert(data);
     }
-    bool contains(const t_tuple & t, context & h) const {
+    bool contains(const t_tuple & t, context & h) const { // probably checking if 
       return ind_0.contains(t, h.hints_0_lower);
     }
     bool contains(const t_tuple & t) const {
@@ -551,9 +555,12 @@ namespace souffle {
     #ifdef _MSC_VER
     #pragma warning(disable: 4100)
     #endif // _MSC_VER
+
+    // 
     void subroutine_1(const std::vector < RamDomain > & args, std::vector < RamDomain > & ret) {
       signalHandler -> setMsg(R "_(path(x,y) :- 
         edge(x, y).in file first.dl[16: 1 - 16: 26]) _ ");
+
       if (!(rel_1_edge -> empty())) {
         [ & ]() {
           CREATE_OP_CONTEXT(rel_1_edge_op_ctxt, rel_1_edge -> createContext());
@@ -572,7 +579,8 @@ namespace souffle {
       [ & ]() {
         CREATE_OP_CONTEXT(rel_2_path_op_ctxt, rel_2_path -> createContext());
         CREATE_OP_CONTEXT(rel_3_delta_path_op_ctxt, rel_3_delta_path -> createContext());
-        for (const auto & env0: * rel_2_path) {
+        
+        for (const auto & env0: * rel_2_path) { // for each tuple in rel_2_path insert it into rel_3_delta_path with context rel_3_delta_path_op_ctxt 
           Tuple < RamDomain, 2 > tuple {
             {
               ramBitCast(env0[0]), ramBitCast(env0[1])
@@ -583,17 +591,24 @@ namespace souffle {
       }
       ();
       iter = 0;
-      for (;;) {
+      for (;;) { // seems to start recognizing the program here, we run this loop until our paths are empty
         signalHandler -> setMsg(R "_(path(x,z) :- 
           path(x, y),
-          edge(y, z).in file first.dl[17: 1 - 17: 38]) _ ");
-        if (!(rel_3_delta_path -> empty()) && !(rel_1_edge -> empty())) {
-          [ & ]() {
+          edge(y, z).in file first.dl[17: 1 - 17: 38]) _ "); // TODO: make sense of this
+        if (!(rel_3_delta_path -> empty()) && !(rel_1_edge -> empty())) { // Let's make sure that our rel_3_delta_path and rel_1_edge are not empty 
+          [ & ]() { // create a lambda function here, the way it's written is 
+            // [capture list] (parameter list) -> return type { function body } 
+            // Here the "capture list" is "&" so it captures variables around the experession by reference
+            // It's very important it is captured by reference, otherwise we won't be able to modify the variables
             CREATE_OP_CONTEXT(rel_1_edge_op_ctxt, rel_1_edge -> createContext());
             CREATE_OP_CONTEXT(rel_4_new_path_op_ctxt, rel_4_new_path -> createContext());
             CREATE_OP_CONTEXT(rel_2_path_op_ctxt, rel_2_path -> createContext());
             CREATE_OP_CONTEXT(rel_3_delta_path_op_ctxt, rel_3_delta_path -> createContext());
-            for (const auto & env0: * rel_3_delta_path) {
+            
+            for (const auto & env0: * rel_3_delta_path) { // for each tuple in rel_3_delta_path 
+
+              // not fully sure what this does, but it seems use some sort of lowerUpperRandom to get the range of values and then look for them in rel_1_edge
+              // MAYBE????? 
               auto range = rel_1_edge -> lowerUpperRange_10(Tuple < RamDomain, 2 > {
                 {
                   ramBitCast(env0[1]), ramBitCast < RamDomain > (MIN_RAM_SIGNED)
@@ -603,7 +618,10 @@ namespace souffle {
                   ramBitCast(env0[1]), ramBitCast < RamDomain > (MAX_RAM_SIGNED)
                 }
               }, READ_OP_CONTEXT(rel_1_edge_op_ctxt));
-              for (const auto & env1: range) {
+
+
+              for (const auto & env1: range) {// for each tuple in the range of values we found in rel_1_edge, pretty sure. or atleast, that makes sense as a next step 
+                // if the tuple we found in rel_1_edge is not in rel_2_path, then we insert it into rel_4_new_path
                 if (!(rel_2_path -> contains(Tuple < RamDomain, 2 > {
                     {
                       ramBitCast(env0[0]), ramBitCast(env1[1])
@@ -621,27 +639,33 @@ namespace souffle {
           }
           ();
         }
-        if (rel_4_new_path -> empty()) break;
-        [ & ]() {
+        if (rel_4_new_path -> empty()) break; // break whenever you can no longer create a path between edges
+        [ & ]() { // yet another lambda function 
+
+          // TODO: Figure out the context of these functions, what they do, and how they work
           CREATE_OP_CONTEXT(rel_4_new_path_op_ctxt, rel_4_new_path -> createContext());
           CREATE_OP_CONTEXT(rel_2_path_op_ctxt, rel_2_path -> createContext());
+
+          // for each tuple in rel_4_new_path, insert it into rel_2_path
           for (const auto & env0: * rel_4_new_path) {
-            Tuple < RamDomain, 2 > tuple {
+            Tuple < RamDomain, 2 > tuple { //  TODO: Figure out what this does, I think there is a notation barrier for me here. Initial guess is that it's a tuple of 2 ram domains but also seems to read like 
+            // Tuple < RamDomain, 2 > { { ramBitCast(env0[0]), ramBitCast(env0[1]) } }
               {
                 ramBitCast(env0[0]), ramBitCast(env0[1])
               }
             };
-            rel_2_path -> insert(tuple, READ_OP_CONTEXT(rel_2_path_op_ctxt));
+            rel_2_path -> insert(tuple, READ_OP_CONTEXT(rel_2_path_op_ctxt)); // insert the tuple into rel_2_path with the context of rel_2_path_op_ctxt 
           }
         }
         ();
-        std::swap(rel_3_delta_path, rel_4_new_path);
-        rel_4_new_path -> purge();
-        iter++;
+        std::swap(rel_3_delta_path, rel_4_new_path); // swap the delta path and the new path
+        rel_4_new_path -> purge(); // clear the new path
+        iter++; // increment iter
       }
-      iter = 0;
-      rel_3_delta_path -> purge();
-      rel_4_new_path -> purge();
+      iter = 0; // reset iter to 0, duh
+
+      rel_3_delta_path -> purge();  // clear the delta path
+      rel_4_new_path -> purge(); // clear the new path
       if (performIO) {
         try {
           std::map < std::string, std::string > directiveMap({
@@ -716,10 +740,10 @@ namespace souffle {
 }
 #else
 }
-int main(int argc, char ** argv) {
+int main(int argc, char ** argv) { // atleast the main function looks recognizable, eh
   try {
     souffle::CmdOptions opt(R "(first.dl)",
-      R "()",
+      R "()", // maybe this allows for a description of the program?, or another file?: Quite interesting 
       R "()",
       false,
       R "()",
